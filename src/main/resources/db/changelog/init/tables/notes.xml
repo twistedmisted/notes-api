@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="createNotesTable" author="twist">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="notes"/>
+            </not>
+        </preConditions>
+        <createTable tableName="notes">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdAt" type="TIMESTAMP" defaultValueDate="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="notes"
+                       columnNames="id"
+                       constraintName="pk_notes"/>
+        <addForeignKeyConstraint baseTableName="notes"
+                                 baseColumnNames="user_id"
+                                 constraintName="fk_notes_users"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>
