@@ -19,9 +19,10 @@
             <column name="text" type="TEXT">
                 <constraints nullable="false"/>
             </column>
-            <column name="createdAt" type="TIMESTAMP" defaultValueDate="now()">
+            <column name="created_at" type="TIMESTAMP" defaultValueDate="now()">
                 <constraints nullable="false"/>
             </column>
+            <column name="updated_at" type="TIMESTAMP"/>
         </createTable>
         <addAutoIncrement tableName="notes"
                           columnName="id"
