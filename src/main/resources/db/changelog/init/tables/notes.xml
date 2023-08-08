@@ -23,6 +23,11 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addAutoIncrement tableName="notes"
+                          columnName="id"
+                          columnDataType="BIGINT"
+                          incrementBy="1"
+                          generationType="ALWAYS" />
         <addPrimaryKey tableName="notes"
                        columnNames="id"
                        constraintName="pk_notes"/>

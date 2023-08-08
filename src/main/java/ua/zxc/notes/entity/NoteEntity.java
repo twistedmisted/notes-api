@@ -1,6 +1,7 @@
 package ua.zxc.notes.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -10,6 +11,8 @@ import lombok.Setter;
 
 import java.sql.Timestamp;
 
+import static jakarta.persistence.GenerationType.IDENTITY;
+
 @Entity
 @Table(name = "notes")
 @Setter
@@ -17,6 +20,7 @@ import java.sql.Timestamp;
 public class NoteEntity {
 
     @Id
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     private String text;

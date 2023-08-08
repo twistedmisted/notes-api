@@ -24,6 +24,11 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addAutoIncrement tableName="users"
+                          columnName="id"
+                          columnDataType="BIGINT"
+                          incrementBy="1"
+                          generationType="ALWAYS" />
         <addPrimaryKey tableName="users"
                        columnNames="id"
                        constraintName="pk_users"/>
