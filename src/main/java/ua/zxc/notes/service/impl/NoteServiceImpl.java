@@ -6,13 +6,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ua.zxc.notes.dto.CreateNoteDto;
 import ua.zxc.notes.dto.NoteDto;
 import ua.zxc.notes.dto.PageDto;
+import ua.zxc.notes.dto.UpdateNoteDto;
 import ua.zxc.notes.entity.NoteEntity;
 import ua.zxc.notes.mapper.impl.NoteMapper;
 import ua.zxc.notes.repository.NoteRepository;
 import ua.zxc.notes.service.NoteService;
 
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
@@ -28,9 +31,14 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public NoteDto getNoteById(Long noteId) {
         log.debug("Getting note by id = [{}]", noteId);
-        NoteEntity noteEntity = noteRepository.findById(noteId)
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "The note with such id does not exist."));
+        NoteEntity noteEntity = getById(noteId);
         return noteMapper.entityToDto(noteEntity);
+    }
+
+    private NoteEntity getById(Long noteId) {
+        return noteRepository.findById(noteId)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "The note with id = [" + noteId +
+                        "] does not exist."));
     }
 
     @Override
@@ -43,5 +51,32 @@ public class NoteServiceImpl implements NoteService {
         }
         return new PageDto<>(noteMapper.entitiesToDtos(notesByUsername.getContent()),
                 numberOfPage, notesByUsername.getTotalPages());
+    }
+
+    @Override
+    public void createNote(CreateNoteDto createNoteDto) {
+        log.debug("Creating note by user = [{}]", createNoteDto.getByUsername());
+        noteRepository.save(noteMapper.dtoToEntity(createNoteDto));
+    }
+
+    @Override
+    public void updateNote(UpdateNoteDto updateNoteDto) {
+        Long noteId = updateNoteDto.getId();
+        log.debug("Updating note with id = [{}] by user = [{}]", noteId, updateNoteDto.getByUsername());
+        NoteEntity noteToUpdate = getById(noteId);
+        if (userHasNotRights(updateNoteDto.getByUsername(), noteToUpdate.getUser().getUsername())) {
+            throw new ResponseStatusException(FORBIDDEN, "You does not have rights to update this note.");
+        }
+        updateInformation(updateNoteDto, noteToUpdate);
+        noteRepository.save(noteToUpdate);
+    }
+
+    private boolean userHasNotRights(String byUsername, String noteOwner) {
+        return !byUsername.equals(noteOwner);
+    }
+
+    private void updateInformation(UpdateNoteDto updateNoteDto, NoteEntity noteToUpdate) {
+        noteToUpdate.setText(updateNoteDto.getText());
+        noteToUpdate.setUpdatedAt(updateNoteDto.getUpdatedAt());
     }
 }

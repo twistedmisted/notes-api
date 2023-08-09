@@ -1,10 +1,13 @@
 package ua.zxc.notes.mapper.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import ua.zxc.notes.dto.CreateNoteDto;
 import ua.zxc.notes.dto.NoteDto;
 import ua.zxc.notes.entity.NoteEntity;
 import ua.zxc.notes.mapper.Mapper;
 import ua.zxc.notes.payload.NotePayload;
+import ua.zxc.notes.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +16,10 @@ import static java.util.Objects.isNull;
 import static ua.zxc.notes.util.Utils.parseTimestampToStringDate;
 
 @Component
+@RequiredArgsConstructor
 public class NoteMapper implements Mapper<NoteEntity, NoteDto> {
+
+    private final UserRepository userRepository;
 
     @Override
     public NoteEntity dtoToEntity(NoteDto dto) {
@@ -51,6 +57,17 @@ public class NoteMapper implements Mapper<NoteEntity, NoteDto> {
         payload.setCreatedAt(parseTimestampToStringDate(dto.getCreatedAt()));
         payload.setUpdatedAt(parseTimestampToStringDate(dto.getUpdatedAt()));
         return payload;
+    }
+
+    public NoteEntity dtoToEntity(CreateNoteDto dto) {
+        if (isNull(dto)) {
+            return null;
+        }
+        NoteEntity entity = new NoteEntity();
+        entity.setText(dto.getText());
+        entity.setCreatedAt(dto.getCreatedAt());
+        entity.setUser(userRepository.findByUsername(dto.getByUsername()).get());
+        return entity;
     }
 
     @Override
